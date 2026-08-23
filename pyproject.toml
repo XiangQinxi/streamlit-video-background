@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "streamlit-video-background"
-version = "0.1.0"
-description = "A reusable Streamlit extension that renders a fullscreen, blurred, translucent video as the page background, with a theme-aware backdrop."
+version = "0.2.0"
+description = "A reusable Streamlit extension that renders a fullscreen, blurred, translucent video as the page background, with a theme-aware backdrop. Supports base64 embedding for hosts without static file serving (e.g. Streamlit Community Cloud)."
 authors = ["XiangQinxi"]
 license = "MIT"
 readme = "README.md"

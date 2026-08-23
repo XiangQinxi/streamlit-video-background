@@ -1,7 +1,15 @@
 """Unit tests for the HTML builder and URL helpers (no Streamlit runtime needed)."""
 
 from streamlit_video_background import build_background_html
-from streamlit_video_background.serving import resolve_video_source, static_url
+from streamlit_video_background.serving import resolve_video_source, static_url, video_data_url
+
+
+def test_video_data_url(tmp_path):
+    p = tmp_path / "bg.mp4"
+    p.write_bytes(b"fakevideo")
+    url = video_data_url(p)
+    assert url.startswith("data:video/mp4;base64,")
+    assert "ZmFrZXZpZGVv" in url  # base64 of "fakevideo"
 
 
 def test_static_url():

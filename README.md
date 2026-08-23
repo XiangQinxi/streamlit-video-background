@@ -76,6 +76,30 @@ enableStaticServing = true
 > ``enableStaticServing`` is a **server-level** option: restart Streamlit after
 > changing it.
 
+### Embed the video (works anywhere — recommended for Community Cloud)
+
+`static/` file serving is not reliably available on **Streamlit Community Cloud**
+(and a `.mp4` may even be served with a `text/plain` content-type there). To make
+sure the background works on any host, embed a small video as base64 with
+``embed=True`` and pass a **local file path**:
+
+```python
+from streamlit_video_background import render_video_background
+from pathlib import Path
+
+render_video_background(
+    Path(__file__).parent / "static" / "bg.mp4",  # committed to the repo
+    embed=True,          # base64 data: URI — no static serving needed
+    blur="8px",
+    opacity=0.5,
+)
+```
+
+Keep the embedded file tiny (compressed + blurred, a few hundred KB) so the page
+payload stays small — use ``compress_video(..., scale=480, blur=3, crf=30)`` to
+prepare one. The file must be committed to the repo so the app can read it at
+runtime.
+
 ## Compress a heavy video (optional)
 
 Backgrounds don't need 1080p or a high bitrate. ``compress_video`` downsizes and

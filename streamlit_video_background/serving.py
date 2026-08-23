@@ -6,6 +6,7 @@ script) at ``/app/static/<name>`` when ``server.enableStaticServing`` is enabled
 
 from __future__ import annotations
 
+import base64
 import shutil
 from pathlib import Path
 from typing import Optional, Union
@@ -14,10 +15,32 @@ import streamlit as st
 
 APP_STATIC_DIRNAME = "static"
 
+_EXT_MIME = {
+    ".mp4": "video/mp4",
+    ".webm": "video/webm",
+    ".mov": "video/quicktime",
+}
+
 
 def static_url(name) -> str:
     """Build the public URL for a file inside the app's ``static/`` directory."""
     return f"/app/static/{Path(name).name}"
+
+
+def video_data_url(path: Union[str, Path], mime: Optional[str] = None) -> str:
+    """Return a ``data:`` URI embedding a local video file as base64.
+
+    Use this to render the background without relying on Streamlit's ``static/``
+    serving, which is not reliably available on Streamlit Community Cloud. Works
+    on any host (local, Community Cloud, self-hosted).
+    """
+    path = Path(path)
+    if not path.exists():
+        raise FileNotFoundError(f"video file not found: {path}")
+    if mime is None:
+        mime = _EXT_MIME.get(path.suffix.lower(), "video/mp4")
+    data = path.read_bytes()
+    return f"data:{mime};base64,{base64.b64encode(data).decode()}"
 
 
 def resolve_video_source(video_source: Union[str, Path]) -> Optional[str]:

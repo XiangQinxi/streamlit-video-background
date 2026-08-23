@@ -16,7 +16,7 @@ from typing import Union
 
 import streamlit as st
 
-from .serving import resolve_video_source
+from .serving import resolve_video_source, video_data_url
 
 DEFAULT_BACKDROP_LIGHT = "#FFFFFF"
 DEFAULT_BACKDROP_DARK = "#0E0E0E"
@@ -152,17 +152,18 @@ def render_video_background(
     object_fit: str = "cover",
     element_id: str = "fl-video-bg",
     backdrop_id: str = "fl-bg-backdrop",
+    embed: bool = False,
 ) -> None:
     """Render a fullscreen video background into the current Streamlit page.
 
     Parameters
     ----------
     video_source:
-        The video to play. Either a URL (``https://...``, ``/app/static/x.mp4``)
-        or a local path. For a local path the file is expected to live in the
-        app's ``static/`` directory (served at ``/app/static/<name>``) — see
-        :func:`streamlit_video_background.serving.ensure_static` and make sure
-        ``server.enableStaticServing = true`` in ``.streamlit/config.toml``.
+        The video to play. With ``embed=False`` this is a URL (``https://...``,
+        ``/app/static/x.mp4``) or a path resolved to the app's ``static/`` folder.
+        With ``embed=True`` it must be a local file path, which is read and
+        embedded as a base64 ``data:`` URI — this works on any host (including
+        Streamlit Community Cloud) without static-file serving.
     blur:
         CSS blur applied to the video, e.g. ``"8px"`` (or ``"0px"`` to disable).
     opacity:
@@ -174,16 +175,31 @@ def render_video_background(
         Native ``<video>`` attributes.
     object_fit:
         CSS ``object-fit`` for the video (``"cover"`` fills the viewport).
+    embed:
+        When ``True``, embed ``video_source`` as base64 instead of referencing a
+        URL. Use this when the video is not served through ``static/`` (e.g. on
+        Streamlit Community Cloud).
     """
-    url = resolve_video_source(video_source)
-    if url is None:
-        st.warning(
-            "video-background: could not resolve a playable source for "
-            f"{video_source!r}. Put the file in the app's `static/` directory and "
-            "enable `server.enableStaticServing` in `.streamlit/config.toml`.",
-            icon=":material/note:",
-        )
-        return
+    if embed:
+        path = Path(video_source)
+        if not path.exists():
+            st.warning(
+                f"video-background: file not found for embedding: {path}",
+                icon=":material/note:",
+            )
+            return
+        url = video_data_url(path)
+    else:
+        url = resolve_video_source(video_source)
+        if url is None:
+            st.warning(
+                "video-background: could not resolve a playable source for "
+                f"{video_source!r}. Put the file in the app's `static/` directory and "
+                "enable `server.enableStaticServing` in `.streamlit/config.toml`, or "
+                "pass `embed=True` with a local file path.",
+                icon=":material/note:",
+            )
+            return
 
     backdrop = _theme_backdrop(backdrop_light, backdrop_dark)
     html = build_background_html(
