@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "streamlit-video-background"
+version = "0.1.0"
+description = "A reusable Streamlit extension that renders a fullscreen, blurred, translucent video as the page background, with a theme-aware backdrop."
+authors = ["XiangQinxi"]
+license = "MIT"
+readme = "README.md"
+keywords = ["streamlit", "video", "background", "extension", "widget"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+]
+packages = [{ include = "streamlit_video_background" }]
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+streamlit = ">=1.30"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.0"
+
+[build-system]
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.urls]
+Documentation = "https://github.com/example/streamlit-video-background"
+Repository = "https://github.com/example/streamlit-video-background"
